@@ -6,6 +6,9 @@ import Smartphones from "./components/Home/smartphones";
 import Laptop from "./components/Home/laptops";
 import Fragrances from "./components/Home/fragrances";
 import Cart from "./components/cart/Cart";
+import Viewproduct from "./components/viewproduct/Viewproduct";
+import LoginSection from "./Login/Login";
+import Register from "./Register/Register";
 
 function App() {
   return (
@@ -18,6 +21,9 @@ function App() {
         <Route path="/laptop" element={<Laptop />} />
         <Route path="/fragrances" element={<Fragrances />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/products/:id" element={<Viewproduct />} />
+        <Route path="/login" element={<LoginSection />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </>
   );

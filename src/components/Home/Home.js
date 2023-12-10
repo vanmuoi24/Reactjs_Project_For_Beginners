@@ -7,8 +7,13 @@ import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
 import { useDispatch, useSelector } from "react-redux";
 import { addcart } from "../../Redux/actions";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Form } from "react-bootstrap";
+import _, { conforms } from "lodash";
 const Home = () => {
   const [product, setproducts] = useState([]);
+  const [valueinput, setvalueinput] = useState();
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 8;
   const indexOfLastProduct = currentPage * perPage;
@@ -17,8 +22,10 @@ const Home = () => {
     indexOfFirstProduct,
     indexOfLastProduct
   );
-  const dataprdoctRedux = useSelector((state) => state.productredux);
-  console.log(dataprdoctRedux);
+  const dataprdoctRedux = useSelector(
+    (state) => state.productredux.productredux
+  );
+  console.log(product);
   let navi = useNavigate();
   const dispatch = useDispatch();
   const fetapiprodct = async () => {
@@ -28,17 +35,63 @@ const Home = () => {
       setproducts(res.products);
     }
   };
+  const handleFilterProduct = (event) => {
+    let searchTerm = event.target.value.toLowerCase();
+    console.log(searchTerm);
 
+    if (searchTerm) {
+      let cloneProducts = _.cloneDeep(product);
+
+      cloneProducts = cloneProducts.filter((item) =>
+        item.title.toLowerCase().includes(searchTerm)
+      );
+      setproducts(cloneProducts);
+    } else {
+      fetapiprodct(1);
+    }
+  };
   useEffect(() => {
     fetapiprodct();
   }, []);
-  const handletocart = (item) => {
-    dispatch(addcart(item));
-    navi("/cart");
+  const handletocart = (itemid) => {
+    console.log(itemid);
+    const isItemExists = dataprdoctRedux.find(
+      (item) => item.id === parseFloat(itemid.id)
+    );
+
+    if (isItemExists) {
+      toast.error("Item already exists in the cart!");
+    } else {
+      dispatch(addcart(itemid));
+
+      toast.success(" success to cart!", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+  };
+  const hanldetoview = (id) => {
+    navi(`/products/${id}`);
   };
   return (
     <>
       <Container>
+        <Row className="mt-5 justify-content-center align-items-center">
+          <Form.Group className="mb-3 col-5" controlId="form12">
+            <Form.Control
+              type="text"
+              placeholder="Search Products"
+              value={valueinput}
+              onChange={(event) => handleFilterProduct(event)}
+            />
+          </Form.Group>
+        </Row>
         <Row className="mt-5 justify-content-center align-items-center ">
           <Col md={6}>
             <h1 className="display-5">MacBook Air</h1>
@@ -82,8 +135,19 @@ const Home = () => {
                 <Card.Body>
                   <Card.Title>{item.title}</Card.Title>
                   <Card.Text>${item.price}</Card.Text>
-                  <Button variant="primary" onClick={() => handletocart(item)}>
-                    Go To Card
+                  <Button
+                    className=" me-3 "
+                    variant="primary"
+                    onClick={() => hanldetoview(item.id)}
+                  >
+                    View Products
+                  </Button>
+                  <Button
+                    variant="primary"
+                    className=" me-3 "
+                    onClick={() => handletocart(item)}
+                  >
+                    Add To Card
                   </Button>
                 </Card.Body>
               </Card>
@@ -98,10 +162,23 @@ const Home = () => {
             onPageChange={setCurrentPage}
           />
         </div>
-
         <div>
           <hr></hr>
         </div>
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        {/* Same as */}
+        <ToastContainer />
       </Container>
     </>
   );

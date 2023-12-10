@@ -1,21 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { deletecart } from "../../Redux/actions";
+import { useNavigate } from "react-router";
+import { NavLink } from "react-router-dom";
+import { fetchProductById } from "../../services/products";
 
 const Cart = () => {
+  let navi = useNavigate();
   const dataprdoctRedux = useSelector(
     (state) => state.productredux.productredux
   );
-
+  console.log(dataprdoctRedux);
   const [total, settotal] = useState(0);
-
   const [inputValues, setInputValues] = useState(dataprdoctRedux.map(() => 1));
+  const dispath = useDispatch();
 
   useEffect(() => {
     const totalPrice = dataprdoctRedux.reduce((accumulator, currentItem) => {
       return accumulator + currentItem.price;
     }, 0);
-
     settotal(totalPrice);
   }, [dataprdoctRedux]);
   const handleInputChange = (event, index) => {
@@ -30,7 +34,12 @@ const Cart = () => {
     settotal(totalproduct);
     setInputValues(newInputValues);
   };
-  console.log("check", total);
+  const handledeleteitem = (id) => {
+    let remove = window.confirm("Are you sure you want to delete item?");
+    if (remove) {
+      dispath(deletecart(id));
+    }
+  };
   return (
     <section className="h-100 h-custom" style={{ backgroundColor: "#eee" }}>
       <Container className="py-5 h-100">
@@ -41,16 +50,18 @@ const Cart = () => {
                 <Row>
                   <Col lg={7}>
                     <h5 className="mb-3">
-                      <a href="#!" className="text-body">
+                      <NavLink to="/" className="text-body">
                         <i className="fas fa-long-arrow-alt-left me-2"></i>
                         Continue shopping
-                      </a>
+                      </NavLink>
                     </h5>
                     <hr />
                     <div className="d-flex justify-content-between align-items-center mb-4">
                       <div>
                         <p className="mb-1">Shopping cart</p>
-                        <p className="mb-0">You have 4 items in your cart</p>
+                        <p className="mb-0">
+                          You have {dataprdoctRedux.length} items in your cart
+                        </p>
                       </div>
                       <div>
                         <p className="mb-0">
@@ -100,7 +111,10 @@ const Cart = () => {
                                   </h5>
                                 </div>
                                 <a href="#!" style={{ color: "#cecece" }}>
-                                  <i className="fas fa-trash-alt"></i>
+                                  <i
+                                    className="fas fa-trash-alt"
+                                    onClick={() => handledeleteitem(item.id)}
+                                  ></i>
                                 </a>
                               </Col>
                             </React.Fragment>

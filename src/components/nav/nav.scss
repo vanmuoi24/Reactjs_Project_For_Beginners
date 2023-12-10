@@ -7,8 +7,24 @@
     color: aliceblue;
   }
   .navbar-nav {
+    position: relative;
     .nav-link {
       color: aliceblue;
+      position: relative;
+    }
+    span {
+      position: absolute;
+      top: 10%;
+      right: 1px;
+      transform: translate(-50%, -50%);
+      background-color: red;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
     }
   }
 }
