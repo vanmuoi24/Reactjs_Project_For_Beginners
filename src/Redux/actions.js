@@ -18,3 +18,9 @@ export const Singin = (value) => {
     payload: value,
   };
 };
+export const Logout = (key) => {
+  return {
+    type: "logout",
+    payload: key,
+  };
+};

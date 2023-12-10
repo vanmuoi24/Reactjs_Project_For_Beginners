@@ -1,9 +1,14 @@
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useDispatch } from "react-redux";
+import { Singin } from "../Redux/actions";
+import { ToastContainer, toast } from "react-toastify";
 const Register = () => {
+  let path = useDispatch();
+  let navi = useNavigate();
   let userSchema = yup.object({
     firstname: yup
       .string()
@@ -33,9 +38,21 @@ const Register = () => {
     mode: "onChange",
     resolver: yupResolver(userSchema),
   });
-  const handleLogin = () => {
-    window.alert("ok");
+  const handleRegister = (data) => {
+    path({
+      type: "userRegister",
+      payload: {
+        email: data.email,
+        firstname: data.firstname,
+        password: data.password,
+      },
+    });
+    toast.success("Sign Up Success");
+    setTimeout(() => {
+      navi("/login");
+    }, 2000);
   };
+
   return (
     <>
       <section className="">
@@ -49,7 +66,7 @@ const Register = () => {
               />
             </Col>
             <Col md={8} lg={6} xl={4} className="offset-xl-1">
-              <Form onSubmit={handleSubmit(handleLogin)}>
+              <Form onSubmit={handleSubmit(handleRegister)}>
                 <div className="d-flex flex-row align-items-center justify-content-center justify-content-lg-start text-center">
                   <p className="lead fw-normal mb-0 me-3 display-3 ">Singin</p>
                 </div>
@@ -138,6 +155,7 @@ const Register = () => {
               </Form>
             </Col>
           </Row>
+          <ToastContainer></ToastContainer>
         </Container>
       </section>
     </>

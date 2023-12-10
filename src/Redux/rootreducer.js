@@ -1,15 +1,13 @@
 const initvalue = {
   productredux: [],
-  user: [
-    {
-      firtname: "",
-      lastname: "",
-      email: "",
-      password: "",
-    },
-  ],
+  user: {
+    email: "",
+    firstname: "",
+    password: "",
+  },
 };
 const rotreducer = (state = initvalue, action) => {
+  console.log(action);
   switch (action.type) {
     case "addcart":
       return {
@@ -27,8 +25,20 @@ const rotreducer = (state = initvalue, action) => {
         productredux: updatedProducts,
       };
 
-    case "userRigister":
-
+    case "userRegister":
+      return {
+        ...state,
+        user: {
+          ...action.payload,
+        },
+      };
+    case "logout":
+      return {
+        ...state,
+        user: {
+          ...action.payload,
+        },
+      };
     default:
       return state;
   }

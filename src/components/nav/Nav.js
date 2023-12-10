@@ -4,17 +4,20 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import "./nav.scss";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
 
 const NavBar = () => {
   let navi = useNavigate();
+  let dis = useDispatch();
   const [lengthcart, setlengthcart] = useState(0);
   const [selectedOption, setSelectedOption] = useState("");
   const dataprdoctRedux = useSelector(
     (state) => state.productredux.productredux
   );
+  const datauser = useSelector((state) => state.productredux.user);
+
   useEffect(() => {
     setlengthcart(dataprdoctRedux.length);
   }, [dataprdoctRedux]);
@@ -23,8 +26,16 @@ const NavBar = () => {
     if (event.target.value === "login") {
       navi("/login");
     } else if (event.target.value === "logout") {
+      dis({
+        type: "logout",
+        payload: { email: "", firstname: "", password: "" },
+      });
+
+      navi("/");
     }
   };
+  useEffect(() => {}, [datauser]);
+  console.log(datauser.email);
   return (
     <>
       <div className="all">
@@ -52,14 +63,22 @@ const NavBar = () => {
                   <i className="fa-solid fa-bag-shopping me-3"></i>
                   <span>{lengthcart}</span>
                 </NavLink>
-                <Nav.Link>
-                  <i className="fa-solid fa-user me-3"></i>
+
+                <Nav.Link className="textuser">
+                  {" "}
+                  <i className="fa-solid fa-user me-3"></i> {datauser.firstname}
                 </Nav.Link>
-                <Nav.Link>Muoi</Nav.Link>
-                <select value={selectedOption} onChange={handleSelection}>
-                  <option value="">Select an option</option>
-                  <option value="login">Login</option>
-                  <option value="logout">Logout</option>
+                <select
+                  value={selectedOption}
+                  onChange={handleSelection}
+                  className=" me-2 "
+                >
+                  <option value="">Action</option>
+                  {datauser.email ? (
+                    <option value="logout">Logout</option>
+                  ) : (
+                    <option value="login">Login</option>
+                  )}
                 </select>
               </Nav>
             </Navbar.Collapse>

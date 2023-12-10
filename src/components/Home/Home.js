@@ -25,6 +25,7 @@ const Home = () => {
   const dataprdoctRedux = useSelector(
     (state) => state.productredux.productredux
   );
+  const datauser = useSelector((state) => state.productredux.user);
   console.log(product);
   let navi = useNavigate();
   const dispatch = useDispatch();
@@ -53,13 +54,15 @@ const Home = () => {
   useEffect(() => {
     fetapiprodct();
   }, []);
+
+  useEffect(() => {}, [datauser]);
   const handletocart = (itemid) => {
     console.log(itemid);
     const isItemExists = dataprdoctRedux.find(
       (item) => item.id === parseFloat(itemid.id)
     );
 
-    if (isItemExists) {
+    if (isItemExists || datauser.firstname == "") {
       toast.error("Item already exists in the cart!");
     } else {
       dispatch(addcart(itemid));
