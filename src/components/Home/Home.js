@@ -5,6 +5,8 @@ import { fetchAllproducts } from "../../services/products";
 import { useNavigate } from "react-router";
 import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
+import { useDispatch, useSelector } from "react-redux";
+import { addcart } from "../../Redux/actions";
 const Home = () => {
   const [product, setproducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,11 +17,13 @@ const Home = () => {
     indexOfFirstProduct,
     indexOfLastProduct
   );
+  const dataprdoctRedux = useSelector((state) => state.productredux);
+  console.log(dataprdoctRedux);
   let navi = useNavigate();
-
+  const dispatch = useDispatch();
   const fetapiprodct = async () => {
     let res = await fetchAllproducts();
-    console.log(res.products);
+
     if (res && res.products) {
       setproducts(res.products);
     }
@@ -28,7 +32,8 @@ const Home = () => {
   useEffect(() => {
     fetapiprodct();
   }, []);
-  const handletocart = () => {
+  const handletocart = (item) => {
+    dispatch(addcart(item));
     navi("/cart");
   };
   return (
@@ -77,7 +82,7 @@ const Home = () => {
                 <Card.Body>
                   <Card.Title>{item.title}</Card.Title>
                   <Card.Text>${item.price}</Card.Text>
-                  <Button variant="primary" onClick={handletocart}>
+                  <Button variant="primary" onClick={() => handletocart(item)}>
                     Go To Card
                   </Button>
                 </Card.Body>
@@ -92,6 +97,10 @@ const Home = () => {
             total={Math.ceil(product.length / perPage)}
             onPageChange={setCurrentPage}
           />
+        </div>
+
+        <div>
+          <hr></hr>
         </div>
       </Container>
     </>

@@ -9,7 +9,7 @@ const Smartphones = (props) => {
   const [product, setproducts] = useState([]);
   const fetapiprodct = async () => {
     let res = await fetchAllproducts();
-    console.log(res.products);
+
     if (res && res.products) {
       setproducts(res.products);
     }

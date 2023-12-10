@@ -1,15 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 const Cart = () => {
-  const [inputvalue, setinputvalue] = useState(1);
-  const handleInputChange = (event) => {
-    const value = parseInt(event.target.value);
-    if (!isNaN(value) && value >= 1) {
-      setinputvalue(value);
-    }
-  };
+  const dataprdoctRedux = useSelector(
+    (state) => state.productredux.productredux
+  );
 
+  const [total, settotal] = useState(0);
+
+  const [inputValues, setInputValues] = useState(dataprdoctRedux.map(() => 1));
+
+  useEffect(() => {
+    const totalPrice = dataprdoctRedux.reduce((accumulator, currentItem) => {
+      return accumulator + currentItem.price;
+    }, 0);
+
+    settotal(totalPrice);
+  }, [dataprdoctRedux]);
+  const handleInputChange = (event, index) => {
+    const { value } = event.target;
+    const newInputValues = [...inputValues];
+    newInputValues[index] = parseInt(value) || 0;
+    const updatedPrices = dataprdoctRedux.map((item, i) => {
+      const quantity = newInputValues[i] || 1;
+      return item.price * quantity;
+    });
+    const totalproduct = updatedPrices.reduce((acc, price) => acc + price, 0);
+    settotal(totalproduct);
+    setInputValues(newInputValues);
+  };
+  console.log("check", total);
   return (
     <section className="h-100 h-custom" style={{ backgroundColor: "#eee" }}>
       <Container className="py-5 h-100">
@@ -40,41 +61,53 @@ const Cart = () => {
                         </p>
                       </div>
                     </div>
-                    <Card className="mb-3">
-                      <Card.Body>
-                        <Row className="d-flex justify-content-between">
-                          <Col className="d-flex flex-row align-items-center">
-                            <div>
-                              <img
-                                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img1.webp"
-                                className="img-fluid rounded-3"
-                                alt="Shopping item"
-                                style={{ width: "65px" }}
-                              />
-                            </div>
-                            <div className="ms-3">
-                              <h5>Iphone 11 pro</h5>
-                              <p className="small mb-0">256GB, Navy Blue</p>
-                            </div>
-                          </Col>
-                          <Col className="d-flex flex-row align-items-center">
-                            <div style={{ width: "50px" }}>
-                              <Form.Control
-                                type="number"
-                                value={inputvalue}
-                                onChange={handleInputChange}
-                              />
-                            </div>
-                            <div style={{ width: "80px" }}>
-                              <h5 className="mb-0">$900</h5>
-                            </div>
-                            <a href="#!" style={{ color: "#cecece" }}>
-                              <i className="fas fa-trash-alt"></i>
-                            </a>
-                          </Col>
-                        </Row>
-                      </Card.Body>
-                    </Card>
+                    {dataprdoctRedux.map((item, index) => (
+                      <Card className="mb-3">
+                        <Card.Body>
+                          <Row className="d-flex justify-content-between">
+                            <React.Fragment key={index}>
+                              <Col className="d-flex flex-row align-items-center">
+                                <div>
+                                  <img
+                                    src={item.images[0]}
+                                    className="img-fluid rounded-3"
+                                    alt="Shopping item"
+                                    style={{ width: "65px" }}
+                                  />
+                                </div>
+                                <div className="ms-3">
+                                  <h5>{item.title}</h5>
+                                  <p className="small mb-0">
+                                    {item.description}
+                                  </p>
+                                </div>
+                              </Col>
+                              <Col className="d-flex flex-row align-items-center">
+                                <div style={{ width: "50px" }}>
+                                  <Form.Control
+                                    type="number"
+                                    value={inputValues[index] || 1}
+                                    onChange={(event) =>
+                                      handleInputChange(event, index)
+                                    }
+                                  />
+                                </div>
+                                <div style={{ width: "80px" }}>
+                                  <h5 className="mb-0">
+                                    $
+                                    {item.price *
+                                      parseFloat(inputValues[index] || 1)}
+                                  </h5>
+                                </div>
+                                <a href="#!" style={{ color: "#cecece" }}>
+                                  <i className="fas fa-trash-alt"></i>
+                                </a>
+                              </Col>
+                            </React.Fragment>
+                          </Row>
+                        </Card.Body>
+                      </Card>
+                    ))}
                   </Col>
                   <Col lg={5}>
                     <Card className="bg-primary text-white rounded-3">
@@ -108,7 +141,7 @@ const Cart = () => {
                         <hr className="my-4" />
                         <div className="d-flex justify-content-between">
                           <p className="mb-2">Subtotal</p>
-                          <p className="mb-2">$4798.00</p>
+                          <p className="mb-2">${total}</p>
                         </div>
                         <div className="d-flex justify-content-between">
                           <p className="mb-2">Shipping</p>
@@ -116,14 +149,14 @@ const Cart = () => {
                         </div>
                         <div className="d-flex justify-content-between mb-4">
                           <p className="mb-2">Total(Incl. taxes)</p>
-                          <p className="mb-2">$4818.00</p>
+                          <p className="mb-2">${total}</p>
                         </div>
                         <button
                           type="button"
                           className="btn btn-info btn-block btn-lg"
                         >
                           <div className="d-flex justify-content-between">
-                            <span>$4818.00</span>
+                            <span>${total + 2000}</span>
                             <span>
                               Checkout{" "}
                               <i className="fas fa-long-arrow-alt-right ms-2"></i>
