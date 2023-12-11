@@ -45,6 +45,7 @@ const Register = () => {
         email: data.email,
         firstname: data.firstname,
         password: data.password,
+        status: false,
       },
     });
     toast.success("Sign Up Success");

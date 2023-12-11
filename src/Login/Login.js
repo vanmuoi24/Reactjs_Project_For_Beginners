@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
+import { login } from "../Redux/actions";
 const LoginSection = () => {
   let navi = useNavigate();
+  const path = useDispatch();
   const [valueemail, setvalueemail] = useState();
   const [valuepass, setvaluepass] = useState();
   const datauser = useSelector((state) => state.productredux.user);
@@ -33,6 +35,11 @@ const LoginSection = () => {
     const confirmUser = datauser;
     if (confirmUser) {
       if (confirmUser.password === valuepass) {
+        path(
+          login({
+            status: true,
+          })
+        );
         toast.success("Login secces");
         navi("/");
       } else {

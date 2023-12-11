@@ -1,4 +1,4 @@
-import { Container, Row, Col, Button, Card } from "react-bootstrap";
+import { Container, Row, Col, Button, Card, Form } from "react-bootstrap";
 import banner from "../../acsset/img/Rectangle 4.png";
 import { useEffect, useState } from "react";
 import { fetchAllproducts } from "../../services/products";
@@ -9,16 +9,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { addcart } from "../../Redux/actions";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Form } from "react-bootstrap";
-import _, { conforms } from "lodash";
+import _ from "lodash";
+
 const Home = () => {
-  const [product, setproducts] = useState([]);
-  const [valueinput, setvalueinput] = useState();
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const perPage = 8;
-  const indexOfLastProduct = currentPage * perPage;
-  const indexOfFirstProduct = indexOfLastProduct - perPage;
-  const currentProducts = product.slice(
+  const [productsPerPage] = useState(8);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
@@ -26,48 +26,55 @@ const Home = () => {
     (state) => state.productredux.productredux
   );
   const datauser = useSelector((state) => state.productredux.user);
-  console.log(product);
+
   let navi = useNavigate();
   const dispatch = useDispatch();
   const fetapiprodct = async () => {
     let res = await fetchAllproducts();
 
     if (res && res.products) {
-      setproducts(res.products);
+      setAllProducts(res.products);
+      setFilteredProducts(res.products);
     }
   };
+
   const handleFilterProduct = (event) => {
     let searchTerm = event.target.value.toLowerCase();
-    console.log(searchTerm);
 
     if (searchTerm) {
-      let cloneProducts = _.cloneDeep(product);
+      let cloneProducts = _.cloneDeep(allProducts);
 
       cloneProducts = cloneProducts.filter((item) =>
         item.title.toLowerCase().includes(searchTerm)
       );
-      setproducts(cloneProducts);
+      setFilteredProducts(cloneProducts);
+      setCurrentPage(1);
     } else {
-      fetapiprodct(1);
+      fetapiprodct();
     }
   };
   useEffect(() => {
     fetapiprodct();
   }, []);
-
+  const handlePaginationChange = (page) => {
+    setCurrentPage(page);
+  };
   useEffect(() => {}, [datauser]);
+  console.log(datauser);
+
   const handletocart = (itemid) => {
     console.log(itemid);
     const isItemExists = dataprdoctRedux.find(
       (item) => item.id === parseFloat(itemid.id)
     );
-
-    if (isItemExists || datauser.firstname == "") {
-      toast.error("Item already exists in the cart!");
+    if (datauser.status === false) {
+      toast.error("Vui lòng đăng nhập tài khoản");
+    } else if (isItemExists) {
+      toast.error("Đơn hàng đã có trong giỏ hàng!");
     } else {
       dispatch(addcart(itemid));
 
-      toast.success(" success to cart!", {
+      toast.success("Success! Item added to cart!", {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
@@ -79,9 +86,19 @@ const Home = () => {
       });
     }
   };
+
   const hanldetoview = (id) => {
     navi(`/products/${id}`);
   };
+
+  const handleFilter = (page) => {
+    console.log(page);
+    console.log(allProducts);
+    const update = allProducts.filter((products) => products.category === page);
+    console.log(update);
+    setFilteredProducts(update);
+  };
+
   return (
     <>
       <Container>
@@ -90,11 +107,11 @@ const Home = () => {
             <Form.Control
               type="text"
               placeholder="Search Products"
-              value={valueinput}
               onChange={(event) => handleFilterProduct(event)}
             />
           </Form.Group>
         </Row>
+
         <Row className="mt-5 justify-content-center align-items-center ">
           <Col md={6}>
             <h1 className="display-5">MacBook Air</h1>
@@ -123,6 +140,26 @@ const Home = () => {
             <img src={banner} height="400px" width="100%" alt="Product" />
           </Col>
         </Row>
+        <Col className="d-flex justify-content-center">
+          <Button
+            className="me-2"
+            onClick={() => setFilteredProducts(allProducts)}
+          >
+            All
+          </Button>
+          <Button className="me-2" onClick={() => handleFilter("smartphones")}>
+            SmartPhone
+          </Button>
+          <Button className="me-2" onClick={() => handleFilter("laptops")}>
+            LapTop
+          </Button>
+          <Button className="me-2" onClick={() => handleFilter("fragrances")}>
+            Fragrances
+          </Button>
+          <Button className="me-2" onClick={() => handleFilter("skincare")}>
+            Skincare
+          </Button>
+        </Col>
       </Container>
 
       <Container>
@@ -158,11 +195,10 @@ const Home = () => {
           ))}
         </Row>
         <div className=" ">
-          {" "}
           <ResponsivePagination
             current={currentPage}
-            total={Math.ceil(product.length / perPage)}
-            onPageChange={setCurrentPage}
+            total={Math.ceil(filteredProducts.length / productsPerPage)}
+            onPageChange={handlePaginationChange}
           />
         </div>
         <div>

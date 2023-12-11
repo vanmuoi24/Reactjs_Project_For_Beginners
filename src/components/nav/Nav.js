@@ -7,7 +7,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
-
 const NavBar = () => {
   let navi = useNavigate();
   let dis = useDispatch();
@@ -28,7 +27,10 @@ const NavBar = () => {
     } else if (event.target.value === "logout") {
       dis({
         type: "logout",
-        payload: { email: "", firstname: "", password: "" },
+        payload: { email: "", firstname: "", password: "", status: false },
+      });
+      dis({
+        type: "clear_cart",
       });
 
       navi("/");
@@ -49,13 +51,13 @@ const NavBar = () => {
                   Home
                 </NavLink>
                 <NavLink to={"/smartphones"} className={" nav-link "}>
-                  SmartPhone
+                  About
                 </NavLink>
                 <NavLink to={"/laptop"} className={" nav-link "}>
-                  LapTop
+                  Adress
                 </NavLink>
                 <NavLink to={"/fragrances"} className={" nav-link "}>
-                  fragrances
+                  actract
                 </NavLink>{" "}
               </Nav>
               <Nav>
@@ -66,7 +68,8 @@ const NavBar = () => {
 
                 <Nav.Link className="textuser">
                   {" "}
-                  <i className="fa-solid fa-user me-3"></i> {datauser.firstname}
+                  <i className="fa-solid fa-user me-3"></i>{" "}
+                  {datauser.status == true ? datauser.firstname : false}
                 </Nav.Link>
                 <select
                   value={selectedOption}
@@ -74,7 +77,7 @@ const NavBar = () => {
                   className=" me-2 "
                 >
                   <option value="">Action</option>
-                  {datauser.email ? (
+                  {datauser.status == true ? (
                     <option value="logout">Logout</option>
                   ) : (
                     <option value="login">Login</option>

@@ -4,6 +4,7 @@ const initvalue = {
     email: "",
     firstname: "",
     password: "",
+    status: false,
   },
 };
 const rotreducer = (state = initvalue, action) => {
@@ -38,6 +39,19 @@ const rotreducer = (state = initvalue, action) => {
         user: {
           ...action.payload,
         },
+      };
+    case "login":
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          ...action.payload,
+        },
+      };
+    case "clear_cart":
+      return {
+        ...state,
+        productredux: [],
       };
     default:
       return state;

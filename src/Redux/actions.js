@@ -24,3 +24,9 @@ export const Logout = (key) => {
     payload: key,
   };
 };
+export const login = (key) => {
+  return {
+    type: "login",
+    payload: key,
+  };
+};
